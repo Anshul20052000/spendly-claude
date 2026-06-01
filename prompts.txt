@@ -12,6 +12,8 @@ Do not modify anything else on the page.
 
 git commit -m "landing: add terms and privacy links to footer”
 
+-------------------------------------------------
+
 Create a "Terms and Conditions" page for Spendly.
 
 1. Add a new route in [@app.py](http://app.py/):
