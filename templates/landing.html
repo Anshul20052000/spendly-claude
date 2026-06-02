@@ -19,6 +19,7 @@
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Start tracking free</a>
             <a href="{{ url_for('login') }}" class="btn-ghost">Sign in</a>
+            <a href="#" class="btn-ghost see-how-it-works">See how it works</a>
         </div>
     </div>
     <div class="hero-visual">
@@ -88,5 +89,114 @@
         <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
     </div>
 </section>
+
+<!-- Modal for "See how it works" -->
+<div id="video-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <div class="video-container">
+            <iframe id="youtube-video" width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: black;
+        text-decoration: none;
+    }
+
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        margin-top: 15px;
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("video-modal");
+
+    // Get the button that opens the modal
+    var btn = document.querySelector(".see-how-it-works");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close-button")[0];
+
+    // Get the YouTube iframe
+    var video = document.getElementById("youtube-video");
+
+    // When the user clicks the button, open the modal
+    btn.onclick = function(event) {
+        event.preventDefault();
+        modal.style.display = "block";
+        // Set video src to start playing
+        video.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+        // Stop the video by removing the src
+        video.src = "";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            // Stop the video by removing the src
+            video.src = "";
+        }
+    }
+</script>
 
 {% endblock %}
