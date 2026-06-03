@@ -1,0 +1,69 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Spendly** is a personal expense-tracking web app (Flask + SQLite) built as a step-by-step learning project. Users log expenses (amount, category, date, description), view category breakdowns and monthly summaries, and filter by time period. The landing page is fully built; backend features (auth, CRUD) are progressively implemented in numbered steps.
+
+## Common Commands
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the dev server (debug on, port 5001)
+python app.py
+
+# Run the test suite
+pytest
+
+# Run a single test file
+pytest tests/test_routes.py
+
+# Run a single test by name
+pytest -k "test_login"
+```
+
+The dev server runs at `http://localhost:5001` (not the default 5000). SQLite database file (`expense_tracker.db`) is gitignored and auto-created on first run.
+
+## Architecture
+
+**Single-file Flask app** (`app.py`) with a flat route layout — currently no blueprints, no `url_for` for non-landing routes. When adding new routes, follow the existing pattern: function returns `render_template("name.html")` for static pages, plain string for placeholders.
+
+**Template hierarchy**: `base.html` is the parent (nav + footer with Terms/Privacy links, DM Serif + DM Sans Google Fonts, `static/css/style.css`). All page templates (`landing.html`, `login.html`, `register.html`, `terms.html`, `privacy.html`) extend it via `{% block content %}` and may add a `{% block head %}` (for page-specific CSS) or `{% block scripts %}` (for page-specific JS).
+
+**Styling split**: `static/css/style.css` holds globals (nav, footer, buttons, typography, base layout). `static/css/landing.css` is landing-page-only and is included via `{% block head %}` in `landing.html`. New page-specific styles should follow this split — global styles go in `style.css`, page-specific styles in a dedicated `static/css/<page>.css`.
+
+**JavaScript**: vanilla JS only, no framework. `static/js/main.js` is loaded on every page via `base.html`; page-specific scripts go in a `{% block scripts %}` block at the bottom of the template.
+
+**Database** (not yet implemented): `database/db.py` is a stub to be filled in by students. Per the comment header, it should expose three functions:
+- `get_db()` — returns a SQLite connection with `row_factory` and foreign keys enabled
+- `init_db()` — creates all tables using `CREATE TABLE IF NOT EXISTS`
+- `seed_db()` — inserts sample development data
+
+## Implementation Roadmap
+
+The `app.py` placeholder comments mark the student-implementation order. Do not implement out of order unless asked:
+
+| Step | Route / File | Purpose |
+|------|-------------|---------|
+| 1 | `database/db.py` | SQLite setup, table creation, seed data |
+| 3 | `GET /logout` | Session teardown |
+| 4 | `GET /profile` | User profile page |
+| 7 | `GET /expenses/add` | Create expense |
+| 8 | `GET /expenses/<id>/edit` | Update expense |
+| 9 | `GET /expenses/<id>/delete` | Delete expense |
+
+Steps 2, 5, 6 (login logic, registration, expense listing) are implied between the placeholders but not explicitly numbered in code.
+
+## Conventions
+
+- **Commits**: imperative mood, lowercase scope prefix, wrapped in double quotes (e.g., `git commit -m "landing: add terms and privacy links to footer"`). The `prompts.txt` file at the repo root is a working log of past prompts and their requested commit messages — refer to it for style.
+- **Edit scope**: when a prompt says "modify only X," do exactly that and do not touch other parts of the page. This is a stated convention across the project history.
+- **No JS framework**: vanilla JS only. Don't reach for jQuery, Alpine, etc.
+- **Placeholder hrefs**: routes/pages being added later use `href="#"` until the target route exists, then are updated to the real path.
+
+## Working With Prompts
+
+`prompts.txt` contains the sequence of prompts that built the landing-page features. New work often continues the same pattern: implement a small, scoped change → commit with the suggested message. Prefer matching the requested commit message exactly when one is provided in the prompt.
