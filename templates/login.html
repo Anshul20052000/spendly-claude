@@ -12,11 +12,17 @@
             <p class="auth-subtitle">Sign in to your Spendly account</p>
         </div>
 
-        <div class="auth-card">
-            {% if error %}
-            <div class="auth-error">{{ error }}</div>
-            {% endif %}
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="auth-messages">
+              {% for message in messages %}
+                <div class="auth-message">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
 
+        <div class="auth-card">
             <form method="POST" action="/login">
                 <div class="form-group">
                     <label for="email">Email address</label>
