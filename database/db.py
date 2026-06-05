@@ -132,3 +132,15 @@ def get_user_by_email(email):
         ).fetchone()
     finally:
         conn.close()
+
+
+def get_user_by_id(user_id):
+    """Look up a user by ID. Returns a Row or None."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            "SELECT id, name, email, created_at FROM users WHERE id = ?",
+            (user_id,),
+        ).fetchone()
+    finally:
+        conn.close()

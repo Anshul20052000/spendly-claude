@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -19,6 +19,8 @@ def landing():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if "user_id" in session:
+        return redirect(url_for("profile"))
     if request.method == "POST":
         # Get form data
         name = request.form.get("name", "").strip()
@@ -67,6 +69,8 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if "user_id" in session:
+        return redirect(url_for("profile"))
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
@@ -113,7 +117,13 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    user = get_user_by_id(session["user_id"])
+    if user is None:
+        session.clear()
+        return redirect(url_for("login"))
+    return render_template("profile.html", user=user)
 
 
 @app.route("/expenses/add")

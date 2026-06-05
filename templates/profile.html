@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">Your Profile</h1>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-field">
+                <label>Name</label>
+                <span>{{ user.name }}</span>
+            </div>
+            <div class="profile-field">
+                <label>Email</label>
+                <span>{{ user.email }}</span>
+            </div>
+            <div class="profile-field">
+                <label>Member since</label>
+                <span>{{ user.created_at[:10] }}</span>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('add_expense') }}" class="action-card">
+                <span class="action-icon">+</span>
+                <span>Add Expense</span>
+            </a>
+            <a href="#" class="action-card">
+                <span class="action-icon">📋</span>
+                <span>View Expenses</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
