@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id
+from database.db import (
+    get_db, init_db, seed_db, create_user,
+    get_user_by_email, get_user_by_id,
+    get_expenses_by_user, get_expense_summary, get_category_breakdown,
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -123,7 +127,18 @@ def profile():
     if user is None:
         session.clear()
         return redirect(url_for("login"))
-    return render_template("profile.html", user=user)
+
+    expenses = get_expenses_by_user(user["id"])
+    summary = get_expense_summary(user["id"])
+    categories = get_category_breakdown(user["id"])
+
+    return render_template(
+        "profile.html",
+        user=user,
+        expenses=expenses,
+        summary=summary,
+        categories=categories,
+    )
 
 
 @app.route("/expenses/add")
