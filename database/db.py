@@ -144,3 +144,50 @@ def get_user_by_id(user_id):
         ).fetchone()
     finally:
         conn.close()
+
+
+def get_expenses_by_user(user_id):
+    """Return up to 10 most recent expenses for a user, newest first."""
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT id, amount, category, date, description "
+            "FROM expenses WHERE user_id = ? ORDER BY date DESC LIMIT 10",
+            (user_id,),
+        ).fetchall()
+        return rows
+    finally:
+        conn.close()
+
+
+def get_expense_summary(user_id):
+    """Return aggregate stats: tx_count, total_spent, top_category."""
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT COUNT(*) AS tx_count, "
+            "       COALESCE(SUM(amount), 0) AS total_spent, "
+            "       (SELECT category FROM expenses "
+            "        WHERE user_id = ? "
+            "        GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1) AS top_category "
+            "FROM expenses WHERE user_id = ?",
+            (user_id, user_id),
+        ).fetchone()
+        return row
+    finally:
+        conn.close()
+
+
+def get_category_breakdown(user_id):
+    """Return per-category totals ordered by amount descending."""
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            "SELECT category, SUM(amount) AS total "
+            "FROM expenses WHERE user_id = ? "
+            "GROUP BY category ORDER BY total DESC",
+            (user_id,),
+        ).fetchall()
+        return rows
+    finally:
+        conn.close()
