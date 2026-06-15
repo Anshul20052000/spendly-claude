@@ -3,8 +3,13 @@ import os
 
 from database.db import (
     get_db, init_db, seed_db, create_user,
-    get_user_by_email, get_user_by_id,
-    get_expenses_by_user, get_expense_summary, get_category_breakdown,
+    get_user_by_email,
+)
+from database.queries import (
+    get_user_by_id,
+    get_summary_stats,
+    get_recent_transactions,
+    get_category_breakdown,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -128,15 +133,15 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    expenses = get_expenses_by_user(user["id"])
-    summary = get_expense_summary(user["id"])
+    summary = get_summary_stats(user["id"])
+    transactions = get_recent_transactions(user["id"])
     categories = get_category_breakdown(user["id"])
 
     return render_template(
         "profile.html",
         user=user,
-        expenses=expenses,
         summary=summary,
+        transactions=transactions,
         categories=categories,
     )
 

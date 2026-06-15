@@ -17,7 +17,7 @@
         <div class="profile-user-meta">
             <span class="profile-user-name">{{ user.name }}</span>
             <span class="profile-user-email">{{ user.email }}</span>
-            <span class="profile-user-since">Member since {{ user.created_at[:10] }}</span>
+            <span class="profile-user-since">Member since {{ user.member_since }}</span>
         </div>
     </div>
 
@@ -29,17 +29,17 @@
         </div>
         <div class="profile-stat">
             <div class="profile-stat-label">Transactions</div>
-            <div class="profile-stat-value">{{ summary.tx_count }}</div>
+            <div class="profile-stat-value">{{ summary.transaction_count }}</div>
         </div>
         <div class="profile-stat">
             <div class="profile-stat-label">Top Category</div>
-            <div class="profile-stat-value">{{ summary.top_category or "—" }}</div>
+            <div class="profile-stat-value">{{ summary.top_category }}</div>
         </div>
     </div>
 
     <!-- Transaction history -->
     <h2 class="profile-section-title">Recent Transactions</h2>
-    {% if expenses %}
+    {% if transactions %}
     <div class="profile-table-wrap">
         <table class="profile-table">
             <thead>
@@ -51,7 +51,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for tx in expenses %}
+            {% for tx in transactions %}
                 <tr>
                     <td>{{ tx.date }}</td>
                     <td>{{ tx.description }}</td>
@@ -74,18 +74,17 @@
 
     <!-- Category breakdown -->
     {% if categories %}
-    {% set max_total = categories[0].total %}
     <h2 class="profile-section-title">Spending by Category</h2>
     <div class="profile-breakdown">
         {% for cat in categories %}
         <div class="profile-cat-row">
-            <span class="profile-cat-name">{{ cat.category }}</span>
+            <span class="profile-cat-name">{{ cat.name }}</span>
             <div class="profile-cat-bar-track">
                 <div class="profile-cat-bar {% if loop.index is even %}profile-cat-bar--alt{% endif %}"
-                     style="width: {{ (cat.total / max_total * 100) if max_total else 0 }}%;">
+                     style="width: {{ cat.pct }}%;">
                 </div>
             </div>
-            <span class="profile-cat-total">₹{{ "%.2f"|format(cat.total) }}</span>
+            <span class="profile-cat-total">₹{{ "%.2f"|format(cat.amount) }}</span>
         </div>
         {% endfor %}
     </div>
