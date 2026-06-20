@@ -1,0 +1,10 @@
+/* ------------------------------------------------------------------ */
+/* Expense form                                                        */
+/* ------------------------------------------------------------------ */
+
+/* Intentionally minimal — base style.css already provides
+   .auth-section, .auth-container, .auth-card, .auth-header,
+   .auth-title, .auth-subtitle, .form-group, .form-input,
+   .btn-submit, .auth-messages, .auth-message.
+
+   Add expense-specific overrides below as needed. */

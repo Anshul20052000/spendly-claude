@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
+from math import isfinite
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 
 from database.db import (
     get_db, init_db, seed_db, create_user,
-    get_user_by_email,
+    get_user_by_email, create_expense,
 )
 from database.queries import (
     get_user_by_id,
@@ -209,9 +210,71 @@ def analytics():
     return render_template("analytics.html")
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        amount_str = request.form.get("amount", "").strip()
+        category = request.form.get("category", "").strip()
+        date = request.form.get("date", "").strip()
+        description = request.form.get("description", "").strip()
+
+        valid_categories = [
+            "Food", "Transport", "Bills", "Health",
+            "Entertainment", "Shopping", "Other",
+        ]
+
+        errors = []
+        amount = None
+
+        # Amount validation
+        if not amount_str:
+            errors.append("Amount is required.")
+        else:
+            try:
+                amount = float(amount_str)
+                if not isfinite(amount):
+                    errors.append("Amount must be a valid number.")
+                elif amount <= 0:
+                    errors.append("Amount must be greater than 0.")
+            except ValueError:
+                errors.append("Amount must be a valid number.")
+
+        # Category validation
+        if not category:
+            errors.append("Category is required.")
+        elif category not in valid_categories:
+            errors.append("Please select a valid category.")
+
+        # Date validation
+        if not date:
+            errors.append("Date is required.")
+        else:
+            try:
+                datetime.strptime(date, "%Y-%m-%d")
+            except ValueError:
+                errors.append("Date must be in YYYY-MM-DD format.")
+
+        # Description validation
+        if not description:
+            errors.append("Description is required.")
+        elif len(description) > 200:
+            errors.append("Description must be 200 characters or fewer.")
+
+        if errors:
+            for error in errors:
+                flash(error)
+            return render_template("add_expense.html")
+
+        create_expense(
+            session["user_id"], amount, category, date, description,
+        )
+        flash("Expense added successfully!")
+        return redirect(url_for("profile"))
+
+    return render_template("add_expense.html")
 
 
 @app.route("/expenses/<int:id>/edit")
