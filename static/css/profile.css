@@ -15,6 +15,78 @@
     margin-bottom: 2rem;
 }
 
+/* ---- Filter bar ---- */
+.profile-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+/* ---- Preset buttons ---- */
+.profile-filter-preset {
+    display: inline-block;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: var(--paper-card);
+    transition: all 0.2s;
+}
+
+.profile-filter-preset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.profile-filter-preset--active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+}
+
+.profile-filter-preset--active:hover {
+    color: var(--paper);
+}
+
+/* ---- Custom range form ---- */
+.profile-filter-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.profile-filter-custom label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+}
+
+.profile-filter-custom input[type="date"] {
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--paper-card);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.profile-filter-custom input[type="date"]:focus {
+    border-color: var(--accent);
+}
+
+.btn-filter-apply {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+}
+
 /* ---- User info card ---- */
 .profile-user-card {
     display: flex;

@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 
@@ -133,9 +135,59 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    summary = get_summary_stats(user["id"])
-    transactions = get_recent_transactions(user["id"])
-    categories = get_category_breakdown(user["id"])
+    # --- Preset date range computation ---
+    today = datetime.now()
+    this_month_from = today.replace(day=1).strftime("%Y-%m-%d")
+    this_month_to = today.strftime("%Y-%m-%d")
+    last_3m_from = (today - timedelta(days=90)).strftime("%Y-%m-%d")
+    last_3m_to = this_month_to
+    last_6m_from = (today - timedelta(days=180)).strftime("%Y-%m-%d")
+    last_6m_to = this_month_to
+
+    presets = {
+        "this_month": {"from": this_month_from, "to": this_month_to},
+        "last_3_months": {"from": last_3m_from, "to": last_3m_to},
+        "last_6_months": {"from": last_6m_from, "to": last_6m_to},
+    }
+
+    # --- Date filter validation ---
+    raw_from = request.args.get("date_from", "").strip()
+    raw_to = request.args.get("date_to", "").strip()
+
+    date_from = None
+    date_to = None
+    if raw_from:
+        try:
+            datetime.strptime(raw_from, "%Y-%m-%d")
+            date_from = raw_from
+        except ValueError:
+            pass
+    if raw_to:
+        try:
+            datetime.strptime(raw_to, "%Y-%m-%d")
+            date_to = raw_to
+        except ValueError:
+            pass
+    if date_from and date_to and date_from > date_to:
+        flash("Start date must be before end date.")
+        date_from = None
+        date_to = None
+
+    # --- Determine active preset ---
+    if date_from == this_month_from and date_to == this_month_to:
+        active_preset = "this_month"
+    elif date_from == last_3m_from and date_to == last_3m_to:
+        active_preset = "last_3_months"
+    elif date_from == last_6m_from and date_to == last_6m_to:
+        active_preset = "last_6_months"
+    elif date_from is None and date_to is None:
+        active_preset = "all_time"
+    else:
+        active_preset = None  # custom range
+
+    summary = get_summary_stats(user["id"], date_from=date_from, date_to=date_to)
+    transactions = get_recent_transactions(user["id"], date_from=date_from, date_to=date_to)
+    categories = get_category_breakdown(user["id"], date_from=date_from, date_to=date_to)
 
     return render_template(
         "profile.html",
@@ -143,6 +195,10 @@ def profile():
         summary=summary,
         transactions=transactions,
         categories=categories,
+        date_from=date_from or "",
+        date_to=date_to or "",
+        active_preset=active_preset,
+        presets=presets,
     )
 
 

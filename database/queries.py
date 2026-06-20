@@ -7,6 +7,26 @@ parameterised SQL, and returns plain dicts/lists — no Flask imports.
 from database.db import get_db
 
 
+def _build_date_filter(user_id, date_from=None, date_to=None):
+    """Return (where_clause, params) for a user-scoped date-filtered query.
+
+    The WHERE clause uses only hardcoded condition strings and ? placeholders;
+    user-supplied date values are always passed as parameters, never interpolated.
+    """
+    conditions = ["user_id = ?"]
+    params = [user_id]
+    if date_from and date_to:
+        conditions.append("date BETWEEN ? AND ?")
+        params.extend([date_from, date_to])
+    elif date_from:
+        conditions.append("date >= ?")
+        params.append(date_from)
+    elif date_to:
+        conditions.append("date <= ?")
+        params.append(date_to)
+    return " AND ".join(conditions), params
+
+
 def get_user_by_id(user_id):
     """Return a dict with name, email, member_since for the given user_id.
 
@@ -39,22 +59,28 @@ def get_user_by_id(user_id):
         conn.close()
 
 
-def get_summary_stats(user_id):
+def get_summary_stats(user_id, date_from=None, date_to=None):
     """Return a dict with total_spent, transaction_count, top_category.
 
     If the user has no expenses, returns:
         {"total_spent": 0, "transaction_count": 0, "top_category": "—"}
+
+    Optional date_from and date_to (YYYY-MM-DD) filter the date range inclusively.
     """
     conn = get_db()
     try:
+        where, params = _build_date_filter(user_id, date_from, date_to)
+
+        # Subquery uses the same date filter; params ordered: subquery first,
+        # then main query (matching the SQL placeholder order).
         row = conn.execute(
             "SELECT COUNT(*) AS transaction_count, "
             "       COALESCE(SUM(amount), 0) AS total_spent, "
-            "       (SELECT category FROM expenses "
-            "        WHERE user_id = ? "
-            "        GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1) AS top_category "
-            "FROM expenses WHERE user_id = ?",
-            (user_id, user_id),
+            f"       (SELECT category FROM expenses "
+            f"        WHERE {where} "
+            f"        GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1) AS top_category "
+            f"FROM expenses WHERE {where}",
+            params + params,
         ).fetchone()
 
         if row["transaction_count"] == 0:
@@ -69,18 +95,22 @@ def get_summary_stats(user_id):
         conn.close()
 
 
-def get_recent_transactions(user_id, limit=10):
+def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """Return a list of dicts for the user's most recent expenses.
 
     Each dict has: date, description, category, amount.
     Ordered newest-first. Returns empty list if no expenses.
+
+    Optional date_from and date_to (YYYY-MM-DD) filter the date range inclusively.
     """
     conn = get_db()
     try:
+        where, params = _build_date_filter(user_id, date_from, date_to)
+
         rows = conn.execute(
-            "SELECT date, description, category, amount "
-            "FROM expenses WHERE user_id = ? ORDER BY date DESC LIMIT ?",
-            (user_id, limit),
+            f"SELECT date, description, category, amount "
+            f"FROM expenses WHERE {where} ORDER BY date DESC LIMIT ?",
+            params + [limit],
         ).fetchall()
         return [
             {
@@ -95,19 +125,23 @@ def get_recent_transactions(user_id, limit=10):
         conn.close()
 
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, date_from=None, date_to=None):
     """Return a list of dicts with name, amount, pct for each category.
 
     Ordered by amount descending. pct values are integers summing to 100.
     Returns empty list if no expenses.
+
+    Optional date_from and date_to (YYYY-MM-DD) filter the date range inclusively.
     """
     conn = get_db()
     try:
+        where, params = _build_date_filter(user_id, date_from, date_to)
+
         rows = conn.execute(
-            "SELECT category, SUM(amount) AS total "
-            "FROM expenses WHERE user_id = ? "
-            "GROUP BY category ORDER BY total DESC",
-            (user_id,),
+            f"SELECT category, SUM(amount) AS total "
+            f"FROM expenses WHERE {where} "
+            f"GROUP BY category ORDER BY total DESC",
+            params,
         ).fetchall()
 
         if not rows:
