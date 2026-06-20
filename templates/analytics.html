@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — Spendly{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="analytics-page">
+    <div class="analytics-coming-soon">
+
+        <div class="analytics-icon">📊</div>
+
+        <h1 class="analytics-title">Analytics<br>Coming Soon</h1>
+
+        <p class="analytics-subtitle">
+            We're building powerful insights to help you understand your spending habits. Stay tuned!
+        </p>
+
+        <div class="analytics-features">
+            <div class="analytics-feature">
+                <div class="analytics-feature-icon">📈</div>
+                <div class="analytics-feature-text">
+                    <span class="analytics-feature-title">Spending Trends</span>
+                    <span class="analytics-feature-desc">Visualise how your spending changes over time with beautiful charts.</span>
+                </div>
+            </div>
+            <div class="analytics-feature">
+                <div class="analytics-feature-icon">🥧</div>
+                <div class="analytics-feature-text">
+                    <span class="analytics-feature-title">Category Breakdown</span>
+                    <span class="analytics-feature-desc">See exactly where your money goes with pie charts and bar graphs.</span>
+                </div>
+            </div>
+            <div class="analytics-feature">
+                <div class="analytics-feature-icon">🎯</div>
+                <div class="analytics-feature-text">
+                    <span class="analytics-feature-title">Budget Goals</span>
+                    <span class="analytics-feature-desc">Set monthly budgets and track your progress toward financial goals.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-cta">
+            <a href="{{ url_for('profile') }}" class="btn-primary">Back to Dashboard</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
