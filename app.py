@@ -7,6 +7,7 @@ import os
 from database.db import (
     get_db, init_db, seed_db, create_user,
     get_user_by_email, create_expense, update_expense,
+    delete_expense as delete_expense_db,
 )
 from database.queries import (
     get_user_by_id,
@@ -358,9 +359,26 @@ def edit_expense(id):
     return render_template("edit_expense.html", expense=expense)
 
 
-@app.route("/expenses/<int:id>/delete")
+@app.route("/expenses/<int:id>/delete", methods=["POST"])
 def delete_expense(id):
-    return "Delete expense — coming in Step 9"
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    try:
+        expense = conn.execute(
+            "SELECT id FROM expenses WHERE id = ? AND user_id = ?",
+            (id, session["user_id"]),
+        ).fetchone()
+    finally:
+        conn.close()
+
+    if expense is None:
+        abort(404)
+
+    delete_expense_db(id, session["user_id"])
+    flash("Expense deleted successfully!")
+    return redirect(url_for("profile"))
 
 
 if __name__ == "__main__":

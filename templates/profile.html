@@ -98,6 +98,15 @@
                            class="profile-action-edit" title="Edit expense">
                             Edit
                         </a>
+                        <form method="POST"
+                              action="{{ url_for('delete_expense', id=tx.id) }}"
+                              style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this expense?');">
+                            <button type="submit" class="profile-action-delete"
+                                    title="Delete expense">
+                                Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
