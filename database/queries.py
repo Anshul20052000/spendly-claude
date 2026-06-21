@@ -98,7 +98,7 @@ def get_summary_stats(user_id, date_from=None, date_to=None):
 def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """Return a list of dicts for the user's most recent expenses.
 
-    Each dict has: date, description, category, amount.
+    Each dict has: id, date, description, category, amount.
     Ordered newest-first. Returns empty list if no expenses.
 
     Optional date_from and date_to (YYYY-MM-DD) filter the date range inclusively.
@@ -108,12 +108,13 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
         where, params = _build_date_filter(user_id, date_from, date_to)
 
         rows = conn.execute(
-            f"SELECT date, description, category, amount "
+            f"SELECT id, date, description, category, amount "
             f"FROM expenses WHERE {where} ORDER BY date DESC LIMIT ?",
             params + [limit],
         ).fetchall()
         return [
             {
+                "id": row["id"],
                 "date": row["date"],
                 "description": row["description"],
                 "category": row["category"],

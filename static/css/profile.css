@@ -214,6 +214,28 @@
     font-variant-numeric: tabular-nums;
 }
 
+.profile-table .col-actions {
+    text-align: center;
+    width: 80px;
+}
+
+.profile-action-edit {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--paper-card);
+    transition: all 0.2s;
+}
+
+.profile-action-edit:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
 /* ---- Category badges ---- */
 .profile-badge {
     display: inline-block;
