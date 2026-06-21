@@ -216,7 +216,7 @@
 
 .profile-table .col-actions {
     text-align: center;
-    width: 80px;
+    width: 140px;
 }
 
 .profile-action-edit {
@@ -234,6 +234,24 @@
 .profile-action-edit:hover {
     border-color: var(--accent);
     background: var(--accent-light);
+}
+
+.profile-action-delete {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--danger);
+    background: var(--paper-card);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.profile-action-delete:hover {
+    border-color: var(--danger);
+    background: var(--danger-light);
 }
 
 /* ---- Category badges ---- */
