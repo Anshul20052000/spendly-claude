@@ -21,7 +21,7 @@ app.secret_key = os.urandom(24)  # For flashing messages
 
 
 # ------------------------------------------------------------------ #
-# Routes                                                              #
+# Routes ---                                                             #
 # ------------------------------------------------------------------ #
 
 @app.route("/")
@@ -115,7 +115,7 @@ def privacy():
 
 
 # ------------------------------------------------------------------ #
-# Placeholder routes — students will implement these                  #
+# Placeholder routes — students will implement these !                 #
 # ------------------------------------------------------------------ #
 
 @app.route("/logout")
