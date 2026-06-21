@@ -206,3 +206,17 @@ def create_expense(user_id, amount, category, date, description):
         return cursor.lastrowid
     finally:
         conn.close()
+
+
+def update_expense(id, user_id, amount, category, date, description):
+    """Update an existing expense owned by user_id."""
+    conn = get_db()
+    try:
+        conn.execute(
+            "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? "
+            "WHERE id = ? AND user_id = ?",
+            (amount, category, date, description, id, user_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
