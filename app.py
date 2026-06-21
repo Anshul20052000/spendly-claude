@@ -18,7 +18,7 @@ from database.queries import (
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # For flashing messages
+app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24))  # For flashing messages
 
 
 # ------------------------------------------------------------------ #
@@ -385,4 +385,5 @@ if __name__ == "__main__":
     with app.app_context():
         init_db()
         seed_db()
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(debug=True, host="0.0.0.0", port=port)
